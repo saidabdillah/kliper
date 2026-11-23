@@ -1,0 +1,29 @@
+name: Verify ClipStudio
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config --quiet && docker compose build web
+      - run: docker compose run --rm web python -m unittest discover -s tests -v
+      - run: |
+          docker compose up -d web
+          curl --retry 20 --retry-connrefused --retry-delay 1 --fail http://localhost:8765/api/projects
+          docker compose exec -T -e WHISPER_MODEL=tiny web python tests/live_check.py
+      - if: always()
+        run: docker compose down --volumes
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: pip install fastapi==0.133.1 uvicorn==0.41.0 playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: node --check web/studio.js && python tests/browser_editor.py

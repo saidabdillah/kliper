@@ -1,0 +1,24 @@
+name: clipstudio
+services:
+  web:
+    build: .
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - studio-data:/data
+    environment:
+      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    pids_limit: 256
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [semantic]
+    volumes: ["ollama-data:/root/.ollama"]
+volumes:
+  studio-data:
+  ollama-data:

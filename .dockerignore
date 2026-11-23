@@ -1,0 +1,11 @@
+*
+!requirements.txt
+!app.py
+!studio.py
+!ranking.py
+!pipeline.py
+!web/
+!web/**
+!tests/
+!tests/*.py
+**/__pycache__/
