@@ -7,7 +7,7 @@ function act(fn){return async(...args)=>{try{await fn(...args)}catch(err){msg(er
 function btn(t,fn,plain=true){let b=el('button',t,plain?'plain':'');b.type='button';b.onclick=act(fn);return b}
 function link(t,url){let a=el('a',t,'button');a.href=url;a.download='';return a}
 function select(opts,init){let s=el('select');for(let [x,t] of opts){let o=el('option',t);o.value=x;s.append(o)}s.value=init;return s}
-function field(p,t,input){let l=el('label',t);l.append(input);p.append(l);return input}
+function field(p,t,input){input.setAttribute('aria-label',t);let l=el('label',t);l.append(input);p.append(l);return input}
 function show(s){v.pause();cancelAnimationFrame(frame);document.querySelectorAll('.card video').forEach(n=>n.pause());for(let k of ['home','project','editor'])$(k).hidden=k!==s;view=s;msg('')}
 async function api(path,method='GET',body){let r=await fetch(path,{method,headers:method==='GET'?{}:{'X-Studio':'1','Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});if(!r.ok){let j=await r.json().catch(()=>({}));throw Error(typeof j.detail==='string'?j.detail:'Permintaan gagal (HTTP '+r.status+').')}return r.json()}
 const base=()=>'/api/'+id, media=f=>base()+'/file/'+f, secs=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
